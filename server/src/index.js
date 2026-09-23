@@ -7,7 +7,7 @@ import { buildRouter } from './api.js';
 import { sendJson } from './router.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PUBLIC_DIR = path.join(__dirname, '..', '..', 'public');
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
