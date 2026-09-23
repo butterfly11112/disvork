@@ -72,6 +72,18 @@ CREATE INDEX IF NOT EXISTS idx_messages_channel ON messages(channel_id, created_
 CREATE INDEX IF NOT EXISTS idx_dm_messages_thread ON dm_messages(thread_id, created_at);
 `);
 
+// Lightweight migrations for columns added after the initial release —
+// safe to run every boot since they only add a column if it's missing.
+function ensureColumn(table, column, ddl) {
+  const cols = raw.prepare(`PRAGMA table_info(${table})`).all();
+  if (!cols.some((c) => c.name === column)) {
+    raw.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+  }
+}
+ensureColumn('users', 'avatar_emoji', 'avatar_emoji TEXT');
+ensureColumn('messages', 'msg_type', "msg_type TEXT NOT NULL DEFAULT 'text'");
+ensureColumn('dm_messages', 'msg_type', "msg_type TEXT NOT NULL DEFAULT 'text'");
+
 // Thin wrapper so call sites can use better-sqlite3-style db.prepare(sql).get/all/run(...args)
 export const db = {
   prepare(sql) {
